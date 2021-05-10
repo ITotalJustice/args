@@ -10,9 +10,9 @@ First, create the meta info for the args you want.
 
 ```c
 enum ArgID {
-	ArgID_HELP,
-	ArgID_VERSION,
-	ArgID_FILE,
+  ArgID_HELP,
+  ArgID_VERSION,
+  ArgID_FILE,
 };
 
 const struct ArgsMeta metas[] = {
