@@ -1,4 +1,4 @@
-#include "../ezargs.h"
+#include "../args.h"
 #include <stdio.h>
 
 

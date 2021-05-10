@@ -1,4 +1,4 @@
-project('ezargs', 'c',
+project('args', 'c',
   version : '1.0',
   license : 'MIT',
   default_options : [
@@ -59,8 +59,8 @@ linkflags = [
 ]
 
 executable(
-	'ezargs',
-	'ezargs.c',
+	'args',
+	'args.c',
 	'examples/basic.c',
     install : true,
     c_args: [ cflags ],
