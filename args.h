@@ -6,6 +6,20 @@ extern "C" {
 #endif
 
 
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_ARGS
+    #define ARGS_PUBLIC __declspec(dllexport)
+  #else
+    #define ARGS_PUBLIC __declspec(dllimport)
+  #endif
+#else
+  #ifdef BUILDING_ARGS
+      #define ARGS_PUBLIC __attribute__ ((visibility ("default")))
+  #else
+      #define ARGS_PUBLIC
+  #endif
+#endif
+
 enum ArgsMetaType {
 	// key only, no value needed
 	ArgsMetaType_NO_VALUE,
@@ -44,7 +58,7 @@ struct Argsdata {
 	int id;
 };
 
-enum ArgsResult args_parse(
+enum ArgsResult ARGS_PUBLIC args_parse(
 	// to skip argv[0] (program name), set the index to > 0
 	int index, int argc, char* const* const argv,
 	// the keys that you want to search
