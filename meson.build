@@ -1,5 +1,5 @@
 project('args', 'c',
-  version : '1.1.0',
+  version : '1.1.1',
   license : 'MIT',
   default_options : [
     'warning_level=3',
@@ -74,5 +74,5 @@ pkg_mod.generate(
   description : 'Simple args parsing',
   subdirs : 'args',
   libraries : shlib,
-  version : '1.1.0',
+  version : '1.1.1',
 )

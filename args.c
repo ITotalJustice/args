@@ -95,9 +95,12 @@ static bool get_value_int(const char* str, long long* out) {
 		base = 16;
 	}
 
-	// todo: replace this with my own version, or handle errno.
-	// not a fan of errno, so more likely to write my own.
-	*out = strtoll(str, NULL, base);
+	char* end_str = NULL;
+	*out = strtoll(str, &end_str, base);
+
+	if (str == end_str || end_str == NULL || *end_str != '\0') {
+		return false;
+	}
 
 	// potential false positive, would need to check errno
 	if (*out == LLONG_MAX || *out == -LLONG_MAX) {
@@ -108,7 +111,12 @@ static bool get_value_int(const char* str, long long* out) {
 }
 
 static bool get_value_double(const char* str, double* out) {
-	*out = strtod(str, NULL);
+	char* end_str = NULL;
+	*out = strtod(str, &end_str);
+
+	if (str == end_str || end_str == NULL || *end_str != '\0') {
+		return false;
+	}
 
 	// potential false positive, would need to check errno
 	if (*out == DBL_MAX || *out == -DBL_MAX) {
