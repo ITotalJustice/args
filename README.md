@@ -19,19 +19,19 @@ const struct ArgsMeta metas[] = {
   {
     .key = "help",
     .id = ArgID_HELP,
-    .type = ArgsMetaType_NO_VALUE,
+    .type = ArgsValueType_NONE,
     .single = 'h'
   },
   {
     .key = "version",
     .id = ArgID_VERSION,
-    .type = ArgsMetaType_NO_VALUE,
+    .type = ArgsValueType_NONE,
     .single = 'v'
   },
   {
     .key = "file",
     .id = ArgID_FILE,
-    .type = ArgsMetaType_VALUE_REQUIRED,
+    .type = ArgsValueType_STR,
     .single = 'f'
   },
 };
@@ -67,20 +67,39 @@ The return value of the parser is an enum. in general, `0 == OK`, any negative n
 
 ```c
 switch (result) {
-  case ArgsResult_MISSING_REQUIRED_VALUE:
-    printf("Args Error: ArgsResult_MISSING_REQUIRED_VALUE\n");
-    return -1;
-
+  case ArgsResult_UNWANTED_VALUE:
+  case ArgsResult_BAD_VALUE:
+  case ArgsResult_MISSING_VALUE:
   case ArgsResult_ERROR:
-    printf("Args Error: ArgsResult_ERROR\n");
+    printf("Args Error: %d\n", result);
     return -1;
 
   case ArgsResult_OK:
-    break;
-
   case ArgsResult_EXTRA_ARGS:
     break;
 }
+```
+
+The filled out data struct looks like this:
+
+```c
+struct Argsdata {
+  const char* key; // key, not always NULL terminated
+  unsigned key_len; // actual length of the key
+  union ArgsValue value; // union of value types
+  int id; // your ID that you set for the key
+};
+```
+
+where `value` is a union of types:
+
+```c
+union ArgsValue {
+  const char* s;
+  long long i;
+  double d;
+  bool b;
+};
 ```
 
 You can loop now through the `struct Argsdata` array we created earlier, here's an example
@@ -97,7 +116,7 @@ for (unsigned i = 0; i < data_count; ++i) {
       break;
 
     case ArgID_FILE:
-      printf("key: %.*s value: %s\n", data[i].key_len, data[i].key, data[i].value);
+      printf("key: %.*s value: %s\n", data[i].key_len, data[i].key, data[i].value.s);
       break;
   }
 }

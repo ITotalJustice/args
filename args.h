@@ -20,42 +20,56 @@ extern "C" {
   #endif
 #endif
 
-enum ArgsMetaType {
-	// key only, no value needed
-	ArgsMetaType_NO_VALUE,
-	// if no value is next, error
-	ArgsMetaType_VALUE_REQUIRED,
-	// value can be next, or not
-	ArgsMetaType_VALUE_OPTIONAL,
+#include <stdbool.h>
+
+
+enum ArgsValueType {
+  // key only, no value needed
+  ArgsValueType_NONE,
+  // STR saves ptr to the raw argv value
+  ArgsValueType_STR,
+  // INT will also handle hex values!
+  ArgsValueType_INT,
+  // can be used for floats also (of course!)
+  ArgsValueType_DOUBLE,
+  // BOOL will handle 1,0 OR true,false
+  ArgsValueType_BOOL,
 };
 
 enum ArgsResult {
-	ArgsResult_MISSING_REQUIRED_VALUE = -2,
+  // [ArgsMetaType_NONE] was set but theres a value set
+	ArgsResult_UNWANTED_VALUE = -4,
+  // got a value missmatch (ie, bool instead of str)
+  ArgsResult_BAD_VALUE = -3,
+  // value wanted, but didn't get anything
+  ArgsResult_MISSING_VALUE = -2,
+  // generic error...
 	ArgsResult_ERROR = -1,
+  // all good!
 	ArgsResult_OK = 0,
-	ArgsResult_EXTRA_ARGS,
+  // 
+	ArgsResult_EXTRA_ARGS = 1,
 };
 
 struct ArgsMeta {
-	// the name of the key
-	const char* const key;
-	// the ID for this key
-	int id;
-	// see above enum
-	enum ArgsMetaType type;
-	// enable support for single key (-d) support
-	// set to zero to disable this, any value non zero will be tried
-	char single;
+	const char* const key;   // the name of the key
+	int id;                  // the ID for this key
+	enum ArgsValueType type; // value type
+	char single;             // if none 0, enables single args, such as -v
+};
+
+union ArgsValue {
+  const char* s;
+  long long i;
+  double d;
+  bool b;
 };
 
 struct Argsdata {
-	const char* key;
-	// can be NULL if no value, this is always NULL terminated
-	const char* value;
-	// key is not always NULL terminated if used like key=value
-	unsigned key_len;
-	// the ID for
-	int id;
+  const char* key;        // key, not always NULL terminated
+  unsigned key_len;       // actual length of the key
+  union ArgsValue value;  // union of value types
+  int id;                 // your ID that you set for the key
 };
 
 enum ArgsResult ARGS_PUBLIC args_parse(
